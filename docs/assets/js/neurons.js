@@ -41,6 +41,7 @@
   let nextFire = 0;
   let last = performance.now();
   let departing = false;
+  let shownGrown = 0; // grown neurons already on screen (new ones fade in)
 
   function mulberry32(seed) {
     return function () {
@@ -500,6 +501,19 @@
       }));
     }
 
+    // Below the fold: the Shop neuron, which opens the shop in place.
+    neurons.push(makeNeuron({
+      x: W / 2, y: H + (WH - H) * 0.5,
+      R: modR, reach: modReach, kind: "stellate", seed: 31337, depth: 1, scale: S,
+      role: "module", module: { id: "shop", label: "Shop", href: "#shop", special: "shop" }, base: 0.06,
+    }));
+    // ...and the Reset neuron, tucked toward the lower left.
+    neurons.push(makeNeuron({
+      x: W * 0.2, y: H + (WH - H) * 0.74,
+      R: modR * 0.85, reach: modReach * 0.85, kind: "pyramidal", seed: 4040, depth: 1, scale: S * 0.9,
+      role: "module", module: { id: "reset", label: "Reset", href: "#reset", special: "reset" }, base: 0.03,
+    }));
+
     // A few more drift in the deeper void below the fold.
     const deep = clamp(Math.round((W * (WH - H)) / 80000), 4, 10);
     const before = neurons.length;
@@ -518,6 +532,32 @@
       }));
     }
 
+    // Each level of the mind grows two more neurons anywhere in the field.
+    // They come from their own seeded stream, so existing neurons never move.
+    const level = window.Mind ? window.Mind.level : 1;
+    const grow = Math.min(18, 2 * (level - 1));
+    const grng = mulberry32(777);
+    let grown = 0;
+    tries = 0;
+    while (grown < grow && tries++ < 2500) {
+      const depth = 0.4 + grng() * 0.45;
+      const R = (13 + grng() * 11) * S * depth * 1.4;
+      const reach = (55 + grng() * 45) * S * depth * 1.3;
+      const x = 0.02 * W + grng() * W * 0.96;
+      const y = top + grng() * (WH - top - reach * 0.4);
+      const ok = neurons.every((n) => Math.hypot(n.x - x, n.y - y) > (n.reach + reach) * (n.role ? 0.6 : 0.62));
+      if (!ok) continue;
+      const n = makeNeuron({
+        x, y, R, reach, kind: grng() < 0.45 ? "pyramidal" : "stellate",
+        seed: 50000 + grown * 97, depth, scale: S * depth * 1.3, base: 0.03, grownIndex: grown,
+      });
+      // Neurons grown since the last layout fade in.
+      if (grown >= shownGrown) n.born = performance.now();
+      neurons.push(n);
+      grown++;
+    }
+    shownGrown = grown;
+
     // Wire it: the title neuron to every module, modules in a ring,
     // background neurons to their nearest neighbours.
     edges = [];
@@ -529,16 +569,23 @@
       a.edges.push(e); b.edges.push(e);
       edges.push(e);
     };
-    const mods = neurons.filter((n) => n.role === "module");
+    const mods = neurons.filter((n) => n.role === "module" && !n.module.special);
     mods.forEach((m, i) => {
       link(center, m);
       link(m, mods[(i + 1) % mods.length]);
     });
+    const nearest = (n) => neurons.filter((q) => q !== n)
+      .sort((p, q) => Math.hypot(p.x - n.x, p.y - n.y) - Math.hypot(q.x - n.x, q.y - n.y));
     for (const n of neurons.filter((q) => !q.role)) {
-      const near = neurons.filter((q) => q !== n)
-        .sort((p, q) => Math.hypot(p.x - n.x, p.y - n.y) - Math.hypot(q.x - n.x, q.y - n.y));
+      const near = nearest(n);
       link(n, near[0]);
       if (rng() < 0.6) link(near[1], n);
+    }
+    for (const sp of neurons.filter((n) => n.module && n.module.special)) {
+      const near = nearest(sp);
+      link(near[0], sp);
+      link(near[1], sp);
+      link(sp, near[2]);
     }
 
     network = paintNetwork();
@@ -640,6 +687,13 @@
   }
 
   function activate(n) {
+    if (n.module.special) {
+      n.flash = 1;
+      fire(n, 2, null, 1, true);
+      if (n.module.special === "shop" && window.Shop) window.Shop.open();
+      if (n.module.special === "reset" && window.Shop) window.Shop.confirmReset();
+      return;
+    }
     if (departing) return;
     departing = true;
     n.flash = 1;
@@ -677,7 +731,7 @@
     if (!reduceMotion && now > nextFire) {
       const pool = neurons.filter((n) => n.edges.length);
       fire(pool[(Math.random() * pool.length) | 0], 3 + ((Math.random() * 2) | 0), null, 0.9, false);
-      nextFire = now + rand(8000, 12000);
+      nextFire = now + rand(8000, 12000) / (window.Mind ? window.Mind.activity : 1);
     }
 
     // Clamped so iOS overscroll bounce never reads outside the network canvas.
@@ -707,10 +761,11 @@
     const drawN = (n) => {
       const b = n.geo.bounds;
       if (n.y + b.y + b.h < sy || n.y + b.y > sy + H) return;
-      ctx.globalAlpha = n.depth;
+      const fadeIn = n.born ? Math.min(1, (now - n.born) / 2500) : 1;
+      ctx.globalAlpha = n.depth * fadeIn;
       ctx.drawImage(n.dark, n.x + b.x, n.y + b.y, b.w, b.h);
       if (n.act > 0.005) {
-        ctx.globalAlpha = n.act * n.depth;
+        ctx.globalAlpha = n.act * n.depth * fadeIn;
         ctx.drawImage(n.lit, n.x + b.x, n.y + b.y, b.w, b.h);
       }
     };
@@ -832,6 +887,19 @@
   });
 
   window.addEventListener("pageshow", (e) => { if (e.persisted) departing = false; });
+
+  // A level-up (or a reset) regrows the network with the right number of neurons.
+  if (window.Mind) {
+    window.Mind.onLevel(() => {
+      pulses = []; rings = [];
+      if (window.Mind.level === 1) shownGrown = 0;
+      layout();
+      // Welcome the new growth with a volley from the title neuron.
+      if (window.Mind.level > 1) fire(center, 3, null, 1, true);
+    });
+  }
+
+  window.Neural = { get count() { return neurons.length; } };
 
   const start = () => {
     layout();

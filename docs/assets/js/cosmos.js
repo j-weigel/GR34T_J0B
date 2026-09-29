@@ -366,36 +366,82 @@
 
   // ---- Thought counter ------------------------------------------------------
   // Every 10 synapses fired between neurons form one thought. Clicking neurons
-  // 20 times within 10 seconds enters nous, which doubles each new thought for
-  // as long as the clicking keeps up. The count lives in sessionStorage: it
-  // follows the visitor across pages and starts over on each new visit.
+  // 20 times within 10 seconds enters nous, which multiplies each new thought
+  // for as long as the clicking keeps up: x2 at first, x5 once the streak has
+  // run 10 seconds, x10 after 17. Upgrades bought in the shop (see shop.js)
+  // raise synapse activity (how often the network fires).
+  //
+  // Lifetime thoughts earned (spending doesn't count against it) level the
+  // mind up: each level grows the network and raises the base thought rate.
+  //
+  // Everything lives in localStorage, so the count keeps growing across
+  // visits in the same browser.
 
   const Mind = (function () {
     const KEY = "jw.thoughts";
     const PER_THOUGHT = 10;
     const NOUS_CLICKS = 20, NOUS_WINDOW = 10000, NOUS_GAP = 1500;
+    const TIERS = [[17000, 10], [10000, 5], [0, 2]]; // [streak length (ms), multiplier]
+    // Lifetime thoughts needed to reach each level (index 0 → level 2).
+    const LEVELS = [30, 100, 300, 800, 2000, 5000, 12000, 30000, 75000];
+    const LEVEL_RATE = 0.15; // +15% thoughts per synapse for each level above 1
     const el = document.querySelector(".thoughts");
-    let thoughts = 0, exchanges = 0, nous = false;
+    let thoughts = 0, earned = 0, progress = 0, levels = {}, activity = 1;
+    let nous = false, streakStart = 0, lastClick = 0;
     let clicks = [], nousTimer = null, bumpTimer = null;
+    const listeners = [], levelListeners = [];
 
     try {
-      const saved = JSON.parse(sessionStorage.getItem(KEY));
+      // Earlier versions kept a per-visit count in sessionStorage; carry it over once.
+      const saved = JSON.parse(localStorage.getItem(KEY) || sessionStorage.getItem(KEY));
       if (saved && Number.isFinite(saved.thoughts)) {
         thoughts = Math.max(0, Math.floor(saved.thoughts));
-        exchanges = clamp0(Math.floor(saved.exchanges) || 0, PER_THOUGHT - 1);
+        const p = Number(saved.progress ?? saved.exchanges);
+        progress = Number.isFinite(p) ? Math.max(0, Math.min(PER_THOUGHT, p)) : 0;
+        if (saved.levels && typeof saved.levels === "object") levels = saved.levels;
+        earned = Number.isFinite(saved.earned) ? saved.earned : thoughts;
       }
     } catch (e) { /* storage unavailable: start fresh */ }
 
-    function clamp0(v, max) { return Math.max(0, Math.min(max, v)); }
-
     function save() {
-      try { sessionStorage.setItem(KEY, JSON.stringify({ thoughts, exchanges })); } catch (e) { /* ignore */ }
+      try { localStorage.setItem(KEY, JSON.stringify({ thoughts, earned, progress, levels })); } catch (e) { /* ignore */ }
+    }
+
+    const levelOf = (e) => 1 + LEVELS.filter((t) => e >= t).length;
+    let level = levelOf(earned);
+
+    function announce(n) {
+      const toast = document.createElement("div");
+      toast.className = "levelup";
+      toast.setAttribute("role", "status");
+      toast.innerHTML = `<span>Level ${n}</span><small>The network grows</small>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4200);
+    }
+
+    function multiplier() {
+      if (!nous) return 1;
+      const streak = lastClick - streakStart;
+      for (const [ms, x] of TIERS) if (streak >= ms) return x;
+      return 2;
     }
 
     function render(bump) {
+      listeners.forEach((f) => f());
       if (!el) return;
+      const x = multiplier();
       el.querySelector(".t-count").textContent = thoughts ? thoughts.toLocaleString() : "";
+      let lv = el.querySelector(".t-lv");
+      if (!lv) {
+        lv = document.createElement("span");
+        lv.className = "t-lv";
+        el.prepend(lv);
+      }
+      lv.textContent = level > 1 ? `Lv ${level}` : "";
+      el.querySelector(".t-nous").textContent = `νοῦς ×${x}`;
       el.classList.toggle("nous", nous);
+      el.classList.toggle("nous-5", x === 5);
+      el.classList.toggle("nous-10", x === 10);
       document.body.classList.toggle("nous", nous);
       if (bump) {
         el.classList.remove("bump");
@@ -410,25 +456,63 @@
 
     return {
       exchange() {
-        exchanges++;
+        progress += 1 + LEVEL_RATE * (level - 1);
         let formed = false;
-        if (exchanges >= PER_THOUGHT) {
-          exchanges = 0;
-          thoughts += nous ? 2 : 1;
+        while (progress >= PER_THOUGHT) {
+          progress -= PER_THOUGHT;
+          const gain = multiplier();
+          thoughts += gain;
+          earned += gain;
           formed = true;
+        }
+        const next = levelOf(earned);
+        if (next > level) {
+          level = next;
+          announce(level);
+          levelListeners.forEach((f) => f(level));
         }
         render(formed);
         save();
       },
+      // Wipe everything: thoughts, lifetime progress, levels, and upgrades.
+      reset() {
+        thoughts = earned = progress = 0;
+        levels = {};
+        level = 1;
+        save();
+        levelListeners.forEach((f) => f(level));
+        render(false);
+      },
       click() {
         const now = performance.now();
+        if (now - lastClick > NOUS_GAP) streakStart = now; // a new unbroken streak
+        lastClick = now;
         clicks.push(now);
         clicks = clicks.filter((t) => now - t < NOUS_WINDOW);
-        if (!nous && clicks.length >= NOUS_CLICKS) { nous = true; render(false); }
+        if (!nous && clicks.length >= NOUS_CLICKS) nous = true;
+        render(false);
         clearTimeout(nousTimer);
         nousTimer = setTimeout(() => { nous = false; clicks = []; render(false); }, NOUS_GAP);
       },
+      // Spend thoughts; refuses (returns false) if there aren't enough.
+      spend(n) {
+        if (n > thoughts) return false;
+        thoughts -= n;
+        render(false);
+        save();
+        return true;
+      },
+      // How many of an upgrade have been bought (upgrade ids → counts).
+      owned(id) { return levels[id] | 0; },
+      setOwned(id, n) { levels[id] = n; save(); render(false); },
+      setActivity(a) { activity = a; },
+      onChange(f) { listeners.push(f); },
+      onLevel(f) { levelListeners.push(f); },
+      get level() { return level; },
+      get activity() { return activity; },
+      get thoughts() { return thoughts; },
       get nous() { return nous; },
+      get multiplier() { return multiplier(); },
     };
   })();
   window.Mind = Mind;
