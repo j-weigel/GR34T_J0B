@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>John Weigel · Portfolio</title>
+  <meta name="description" content="Portfolio of John Weigel, neuroscience undergraduate.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/cosmos.css">
+</head>
+<body class="home">
+  <canvas id="cosmos" aria-hidden="true"></canvas>
+  <canvas id="neural" aria-hidden="true"></canvas>
+
+  <header class="crossbar">
+    <a class="sigil" href="index.html">J <span>✦</span> W</a>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="modules">Modules</button>
+    <nav aria-label="Modules">
+      <ul id="modules">
+        <li><a class="mod" data-module="about" href="about.html" data-veil>About Me</a></li>
+        <li><a class="mod" data-module="past" href="past-projects.html" data-veil>Past Projects</a></li>
+        <li><a class="mod" data-module="current" href="current-projects.html" data-veil>Current Projects</a></li>
+        <li><a class="mod" data-module="experience" href="experience.html" data-veil>Experience</a></li>
+        <li><a class="mod" data-module="contact" href="contact.html" data-veil>Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- The title neuron; neurons.js positions it over the central soma. -->
+  <a class="neuron-core" href="index.html" aria-label="John Weigel, Neuroscience Undergraduate — home">
+    <span class="pre">The Portfolio of</span>
+    <h1>John Weigel</h1>
+    <span class="role">Neuroscience Undergraduate</span>
+  </a>
+
+  <p class="hint">Hover a neuron · Follow its signal</p>
+
+  <div class="veil" aria-hidden="true"></div>
+
+  <script src="assets/js/cosmos.js"></script>
+  <script src="assets/js/neurons.js"></script>
+</body>
+</html>

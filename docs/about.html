@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Me · John Weigel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/cosmos.css">
+</head>
+<body>
+  <canvas id="cosmos" aria-hidden="true"></canvas>
+
+  <header class="crossbar">
+    <a class="sigil" href="index.html" data-veil>J <span>✦</span> W</a>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="modules">Modules</button>
+    <nav aria-label="Modules">
+      <ul id="modules">
+        <li><a class="mod" href="about.html" aria-current="page" data-veil>About Me</a></li>
+        <li><a class="mod" href="past-projects.html" data-veil>Past Projects</a></li>
+        <li><a class="mod" href="current-projects.html" data-veil>Current Projects</a></li>
+        <li><a class="mod" href="experience.html" data-veil>Experience</a></li>
+        <li><a class="mod" href="contact.html" data-veil>Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="page">
+    <header class="page-head">
+      <div class="kicker">Module I</div>
+      <h1>About Me</h1>
+      <p class="lede">The mind behind the network.</p>
+      <div class="ornament"><span>✦</span></div>
+    </header>
+
+    <section class="panel placeholder">
+      <h2>Still forming</h2>
+      <p>This module is waiting for its story: who I am, what drew me to neuroscience, and the questions that keep me up at night.</p>
+    </section>
+
+    <div class="grid">
+      <article class="panel"><h3>Studying</h3><p>Neuroscience, undergraduate.</p></article>
+      <article class="panel"><h3>Interests</h3><p>To be written.</p></article>
+      <article class="panel"><h3>Beyond the lab</h3><p>To be written.</p></article>
+    </div>
+  </main>
+
+  <footer class="foot">John Weigel · Neuroscience</footer>
+  <div class="veil" aria-hidden="true"></div>
+
+  <script src="assets/js/cosmos.js"></script>
+</body>
+</html>

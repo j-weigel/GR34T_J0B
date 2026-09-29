@@ -1,0 +1,27 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define our pumpkin function
+def f(x):
+    return 4 - (x - 2)**2
+
+# Define the derivative (needed for Newton and Gradient Descent)
+# f'(x) = -2(x - 2)
+def df(x):
+    return -2 * (x - 2)
+
+# Define the second derivative (needed for Newton's Method)
+# f''(x) = -2
+def ddf(x):
+    return -2
+
+# Let's visualize the pumpkin's flight first!
+x_vals = np.linspace(0, 4, 100)
+plt.plot(x_vals, f(x_vals), label='Pumpkin Path')
+plt.axvline(2, color='red', linestyle='--', label='Actual Peak (x=2)')
+plt.title("Pumpkin Trajectory")
+plt.xlabel("Distance (m)")
+plt.ylabel("Height (m)")
+plt.legend()
+plt.grid(True)
+plt.show()
