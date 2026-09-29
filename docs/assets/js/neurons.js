@@ -453,6 +453,8 @@
     S = clamp(Math.min(W, H * 1.3) / 1000, 0.55, 1.2);
     WH = Math.round(H * 1.55);
     document.body.style.height = WH + "px";
+    const layerEl = document.querySelector(".neural-layer");
+    if (layerEl) layerEl.style.height = WH + "px";
     const hint = document.querySelector(".hint");
     if (hint) hint.style.top = H - 64 + "px";
 
@@ -573,7 +575,7 @@
             e.preventDefault();
             activate(n);
           });
-          document.body.appendChild(el);
+          (document.querySelector(".neural-layer") || document.body).appendChild(el);
           nodeEls.set(n.module.id, el);
         }
         el._neuron = n;
@@ -661,6 +663,12 @@
   // ---- Frame --------------------------------------------------------------
 
   function frame(now) {
+    // Fully zoomed out into the brain view: the network rests, unseen.
+    if (window.Brain && window.Brain.progress >= 0.999) {
+      last = now;
+      requestAnimationFrame(frame);
+      return;
+    }
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     const t = now / 1000;
@@ -674,7 +682,7 @@
 
     // Clamped so iOS overscroll bounce never reads outside the network canvas.
     const sy = clamp(window.scrollY, 0, Math.max(0, WH - H));
-    const over = hitTest(pointer.x, pointer.y + sy);
+    const over = window.Brain && window.Brain.progress > 0 ? null : hitTest(pointer.x, pointer.y + sy);
     if (over !== hovered) {
       hovered = over;
       // Brushing a neuron sends a small volley to its neighbours.

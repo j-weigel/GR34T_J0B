@@ -8,11 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/cosmos.css?v=4">
+  <link rel="stylesheet" href="assets/css/cosmos.css?v=5">
 </head>
 <body class="home">
   <canvas id="cosmos" aria-hidden="true"></canvas>
   <canvas id="neural" aria-hidden="true"></canvas>
+  <canvas id="brain" aria-label="A nebula brain. Drag to rotate; double-click to return to the neurons."></canvas>
 
   <header class="crossbar">
     <div class="brand">
@@ -33,17 +34,24 @@
     </nav>
   </header>
 
-  <!-- The title neuron; neurons.js positions it over the central soma. -->
-  <a class="neuron-core" href="index.html" aria-label="John Weigel — home">
-    <span class="pre">The Portfolio of</span>
-    <h1>John Weigel</h1>
-  </a>
+  <!-- Everything that zooms away with the network; neurons.js adds the module nodes. -->
+  <div class="neural-layer">
+    <!-- The title neuron; neurons.js positions it over the central soma. -->
+    <a class="neuron-core" href="index.html" aria-label="John Weigel — home">
+      <span class="pre">The Portfolio of</span>
+      <h1>John Weigel</h1>
+    </a>
 
-  <p class="hint">Hover a neuron · Follow its signal<span class="descend">Scroll to descend<i>⌄</i></span></p>
+    <p class="hint">Hover a neuron · Follow its signal<span class="descend">Scroll to descend<i>⌄</i></span></p>
+  </div>
+
+  <p class="brain-hint">Drag to turn the mind · Pinch in or double-click to return</p>
+  <button class="zoom-toggle" type="button" aria-pressed="false">Zoom out</button>
 
   <div class="veil" aria-hidden="true"></div>
 
-  <script src="assets/js/cosmos.js?v=4"></script>
-  <script src="assets/js/neurons.js?v=4"></script>
+  <script src="assets/js/cosmos.js?v=5"></script>
+  <script src="assets/js/neurons.js?v=5"></script>
+  <script src="assets/js/brain.js?v=5"></script>
 </body>
 </html>
