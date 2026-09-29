@@ -38,7 +38,7 @@
       ux: Math.cos(angle), uy: Math.sin(angle),   // along the band
       nx: -Math.sin(angle), ny: Math.cos(angle),  // across the band
       len: Math.hypot(w, h),
-      width: Math.min(w, h) * 0.22,
+      width: Math.min(w, h) * 0.16,
     };
   }
 
@@ -60,8 +60,8 @@
 
     // Deep base with a faint violet vignette.
     const base = g.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, Math.hypot(w, h) * 0.6);
-    base.addColorStop(0, "#0b0820");
-    base.addColorStop(0.55, "#05040f");
+    base.addColorStop(0, "#07051a");
+    base.addColorStop(0.5, "#03020b");
     base.addColorStop(1, "#010005");
     g.fillStyle = base;
     g.fillRect(0, 0, w, h);
@@ -74,7 +74,7 @@
     const palette = [
       [107, 63, 160], [42, 47, 122], [31, 111, 139], [160, 64, 110], [70, 40, 140], [30, 70, 130],
     ];
-    const clouds = Math.round(160 + area / 9000);
+    const clouds = Math.round(90 + area / 16000);
     for (let i = 0; i < clouds; i++) {
       const t = gauss() * 0.55;
       const [x, y] = bandPoint(b, t, gauss() * 0.45);
@@ -82,7 +82,7 @@
       const r = rand(40, 180) * (0.6 + core * 0.8);
       let [cr, cg, cb] = palette[(Math.random() * palette.length) | 0];
       if (Math.random() < core * 0.5) [cr, cg, cb] = [201, 163, 106];
-      const a = rand(0.012, 0.04) * (0.5 + core);
+      const a = rand(0.007, 0.024) * (0.45 + core);
       const grad = g.createRadialGradient(x, y, 0, x, y, r);
       grad.addColorStop(0, `rgba(${cr},${cg},${cb},${a})`);
       grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
@@ -93,11 +93,11 @@
     }
 
     // A few isolated nebulae away from the band.
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 3; i++) {
       const x = rand(0, w), y = rand(0, h), r = rand(120, 320);
       const [cr, cg, cb] = palette[(Math.random() * palette.length) | 0];
       const grad = g.createRadialGradient(x, y, 0, x, y, r);
-      grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.05)`);
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},0.03)`);
       grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
       g.fillStyle = grad;
       g.fillRect(x - r, y - r, r * 2, r * 2);
@@ -120,10 +120,10 @@
 
     // Star field — dense in the band, sparse elsewhere.
     g.globalCompositeOperation = "lighter";
-    const stars = Math.round(area / 260);
+    const stars = Math.round(area / 430);
     for (let i = 0; i < stars; i++) {
       let x, y;
-      if (Math.random() < 0.62) {
+      if (Math.random() < 0.55) {
         [x, y] = bandPoint(b, rand(-1, 1), gauss() * 0.5);
       } else {
         x = rand(0, w); y = rand(0, h);
@@ -138,7 +138,7 @@
     }
 
     // Bright stars with diffraction glints.
-    for (let i = 0; i < Math.round(area / 60000) + 6; i++) {
+    for (let i = 0; i < Math.round(area / 120000) + 3; i++) {
       const x = rand(0, w), y = rand(0, h), r = rand(1, 2.2);
       const grad = g.createRadialGradient(x, y, 0, x, y, r * 8);
       grad.addColorStop(0, "rgba(255,255,255,0.9)");
@@ -160,7 +160,7 @@
 
     // Live twinkling stars, biased toward the band like the static ones.
     twinklers = [];
-    const tCount = Math.round(area / 9000);
+    const tCount = Math.round(area / 15000);
     for (let i = 0; i < tCount; i++) {
       let x, y;
       if (Math.random() < 0.55) [x, y] = bandPoint(b, rand(-1, 1), gauss() * 0.5);
@@ -169,7 +169,7 @@
     }
 
     motes = [];
-    for (let i = 0; i < Math.round(area / 25000); i++) {
+    for (let i = 0; i < Math.round(area / 42000); i++) {
       motes.push({
         x: rand(0, w), y: rand(0, h),
         vx: rand(-4, 4), vy: rand(-3, 3),
@@ -324,7 +324,7 @@
 
     if (!reduceMotion) {
       spawnClock -= dt;
-      if (spawnClock <= 0 && quanta.length < 28) {
+      if (spawnClock <= 0 && quanta.length < 20) {
         spawnQuantum();
         spawnClock = rand(0.12, 0.5);
       }
@@ -360,6 +360,77 @@
       toggle.setAttribute("aria-expanded", String(open));
     });
   }
+
+  // ---- Thought counter ------------------------------------------------------
+  // Every 10 exchanges between neurons form one thought. Clicking neurons 20
+  // times within 10 seconds enters nous, which doubles each new thought for
+  // as long as the clicking keeps up. The count is kept in localStorage so it
+  // follows the visitor across pages and visits.
+
+  const Mind = (function () {
+    const KEY = "jw.thoughts";
+    const PER_THOUGHT = 10;
+    const NOUS_CLICKS = 20, NOUS_WINDOW = 10000, NOUS_GAP = 1500;
+    const el = document.querySelector(".thoughts");
+    let thoughts = 0, exchanges = 0, nous = false;
+    let clicks = [], nousTimer = null, bumpTimer = null;
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY));
+      if (saved && Number.isFinite(saved.thoughts)) {
+        thoughts = Math.max(0, Math.floor(saved.thoughts));
+        exchanges = clamp0(Math.floor(saved.exchanges) || 0, PER_THOUGHT - 1);
+      }
+    } catch (e) { /* storage unavailable: start fresh */ }
+
+    function clamp0(v, max) { return Math.max(0, Math.min(max, v)); }
+
+    function save() {
+      try { localStorage.setItem(KEY, JSON.stringify({ thoughts, exchanges })); } catch (e) { /* ignore */ }
+    }
+
+    function render(bump) {
+      if (!el) return;
+      el.querySelector(".t-count").textContent = thoughts.toLocaleString();
+      el.querySelector(".t-label").textContent = thoughts === 1 ? "thought" : "thoughts";
+      el.style.setProperty("--p", (exchanges / PER_THOUGHT) * 100 + "%");
+      el.classList.toggle("nous", nous);
+      document.body.classList.toggle("nous", nous);
+      if (bump) {
+        el.classList.remove("bump");
+        void el.offsetWidth; // restart the animation
+        el.classList.add("bump");
+        clearTimeout(bumpTimer);
+        bumpTimer = setTimeout(() => el.classList.remove("bump"), 900);
+      }
+    }
+
+    render(false);
+
+    return {
+      exchange() {
+        exchanges++;
+        let formed = false;
+        if (exchanges >= PER_THOUGHT) {
+          exchanges = 0;
+          thoughts += nous ? 2 : 1;
+          formed = true;
+        }
+        render(formed);
+        save();
+      },
+      click() {
+        const now = performance.now();
+        clicks.push(now);
+        clicks = clicks.filter((t) => now - t < NOUS_WINDOW);
+        if (!nous && clicks.length >= NOUS_CLICKS) { nous = true; render(false); }
+        clearTimeout(nousTimer);
+        nousTimer = setTimeout(() => { nous = false; clicks = []; render(false); }, NOUS_GAP);
+      },
+      get nous() { return nous; },
+    };
+  })();
+  window.Mind = Mind;
 
   // Fade out through the veil before following internal links.
   window.Cosmos = {

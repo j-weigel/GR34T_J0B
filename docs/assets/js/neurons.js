@@ -29,6 +29,7 @@
   const TAU = Math.PI * 2;
 
   let W = 0, H = 0, S = 1;
+  let WH = 0; // world height: the field continues below the first screen
   let neurons = [];
   let edges = [];
   let pulses = [];
@@ -408,7 +409,7 @@
 
   function paintNetwork() {
     const c = document.createElement("canvas");
-    c.width = Math.round(W * DPR); c.height = Math.round(H * DPR);
+    c.width = Math.round(W * DPR); c.height = Math.round(WH * DPR);
     const g = c.getContext("2d");
     g.setTransform(DPR, 0, 0, DPR, 0, 0);
     g.lineCap = "round";
@@ -447,6 +448,10 @@
     canvas.style.width = W + "px";
     canvas.style.height = H + "px";
     S = clamp(Math.min(W, H * 1.3) / 1000, 0.55, 1.2);
+    WH = Math.round(H * 1.55);
+    document.body.style.height = WH + "px";
+    const hint = document.querySelector(".hint");
+    if (hint) hint.style.top = H - 64 + "px";
 
     const top = navHeight();
     const cx = W / 2, cy = top + (H - top) / 2;
@@ -487,6 +492,24 @@
       neurons.push(makeNeuron({
         x, y, R, reach, kind: rng() < 0.45 ? "pyramidal" : "stellate",
         seed: 9000 + neurons.length * 131, depth, scale: S * depth * 1.3, base: 0.03,
+      }));
+    }
+
+    // A few more drift in the deeper void below the fold.
+    const deep = clamp(Math.round((W * (WH - H)) / 80000), 4, 10);
+    const before = neurons.length;
+    tries = 0;
+    while (neurons.length < before + deep && tries++ < 900) {
+      const depth = 0.4 + rng() * 0.45;
+      const R = (14 + rng() * 12) * S * depth * 1.4;
+      const reach = (60 + rng() * 50) * S * depth * 1.3;
+      const x = 0.02 * W + rng() * W * 0.96;
+      const y = H * 0.98 + rng() * (WH - H * 0.98 - reach * 0.5);
+      const ok = neurons.every((n) => Math.hypot(n.x - x, n.y - y) > (n.reach + reach) * (n.role ? 0.62 : 0.85));
+      if (!ok) continue;
+      neurons.push(makeNeuron({
+        x, y, R, reach, kind: rng() < 0.45 ? "pyramidal" : "stellate",
+        seed: 17000 + neurons.length * 131, depth, scale: S * depth * 1.3, base: 0.03,
       }));
     }
 
@@ -565,6 +588,7 @@
         core.addEventListener("blur", () => { if (focused === center) focused = null; });
         core.addEventListener("click", (e) => {
           e.preventDefault();
+          if (window.Mind) window.Mind.click();
           fire(center, 3, null, 1, true);
         });
       }
@@ -603,6 +627,7 @@
         trail: 70 * S,
         arrive: () => {
           if (forward) e.termGlow = 1;
+          if (window.Mind) window.Mind.exchange();
           fire(forward ? e.b : e.a, hops - 1, e, strength * 0.92, false);
         },
       });
@@ -616,7 +641,7 @@
     fire(n, 2, null, 1, true);
     const el = nodeEls.get(n.module.id);
     if (el) el.classList.add("lit");
-    setTimeout(() => window.Cosmos.depart(n.module.href, n.x, n.y), reduceMotion ? 0 : 420);
+    setTimeout(() => window.Cosmos.depart(n.module.href, n.x, n.y - window.scrollY), reduceMotion ? 0 : 420);
   }
 
   function hitTest(x, y) {
@@ -644,7 +669,9 @@
       nextFire = now + rand(8000, 12000);
     }
 
-    const over = hitTest(pointer.x, pointer.y);
+    // Clamped so iOS overscroll bounce never reads outside the network canvas.
+    const sy = clamp(window.scrollY, 0, Math.max(0, WH - H));
+    const over = hitTest(pointer.x, pointer.y + sy);
     if (over !== hovered) {
       hovered = over;
       // Brushing a neuron sends a small volley to its neighbours.
@@ -663,11 +690,12 @@
       n.act = clamp(Math.max(n.hover, n.flash) + breath, 0, 1);
     }
 
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, -sy * DPR);
+    ctx.clearRect(0, sy, W, H);
 
     const drawN = (n) => {
       const b = n.geo.bounds;
+      if (n.y + b.y + b.h < sy || n.y + b.y > sy + H) return;
       ctx.globalAlpha = n.depth;
       ctx.drawImage(n.dark, n.x + b.x, n.y + b.y, b.w, b.h);
       if (n.act > 0.005) {
@@ -679,7 +707,7 @@
     // Background neurons, then the axon web, then the labelled neurons.
     for (const n of neurons) if (!n.role) drawN(n);
     ctx.globalAlpha = 1;
-    ctx.drawImage(network, 0, 0, W, H);
+    ctx.drawImage(network, 0, sy * DPR, W * DPR, H * DPR, 0, sy, W, H);
     for (const n of neurons) if (n.role) drawN(n);
 
     ctx.globalCompositeOperation = "lighter";
@@ -725,7 +753,7 @@
         glowDot(x, y, 7 * S, `rgba(243,217,164,${0.8 * Math.exp(-behind / (45 * S))})`);
       }
       const [hx, hy] = pointAt(e, pos(Math.min(p.d, e.total)));
-      glowDot(hx, hy, 11 * S, "rgba(235,248,255,0.95)");
+      glowDot(hx, hy, 11 * S, window.Mind && window.Mind.nous ? "rgba(255,230,170,0.95)" : "rgba(235,248,255,0.95)");
     }
     ctx.globalAlpha = 1;
     const arrived = pulses.filter((p) => p.d >= p.e.total);
@@ -775,8 +803,9 @@
 
   // Background neurons react to clicks too — they just don't go anywhere.
   canvas.addEventListener("click", (e) => {
-    const n = hitTest(e.clientX, e.clientY);
+    const n = hitTest(e.clientX, e.clientY + window.scrollY);
     if (!n) return;
+    if (window.Mind) window.Mind.click();
     if (n === center) fire(center, 3, null, 1, true);
     else if (n.role === "module") activate(n);
     else fire(n, 2, null, 1, false);
@@ -785,7 +814,10 @@
   let resizeTimer;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { pulses = []; rings = []; layout(); }, 150);
+    resizeTimer = setTimeout(() => {
+      if (window.innerWidth === W && Math.abs(window.innerHeight - H) < 120) return;
+      pulses = []; rings = []; layout();
+    }, 150);
   });
 
   window.addEventListener("pageshow", (e) => { if (e.persisted) departing = false; });
