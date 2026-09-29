@@ -717,12 +717,6 @@
   // ---- Frame --------------------------------------------------------------
 
   function frame(now) {
-    // Fully zoomed out into the brain view: the network rests, unseen.
-    if (window.Brain && window.Brain.progress >= 0.999) {
-      last = now;
-      requestAnimationFrame(frame);
-      return;
-    }
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     const t = now / 1000;
@@ -732,6 +726,20 @@
       const pool = neurons.filter((n) => n.edges.length);
       fire(pool[(Math.random() * pool.length) | 0], 3 + ((Math.random() * 2) | 0), null, 0.9, false);
       nextFire = now + rand(8000, 12000) / (window.Mind ? window.Mind.activity : 1);
+    }
+
+    // Fully zoomed out into the brain view the network is out of sight, but it
+    // keeps thinking: signals still travel and land (and count toward
+    // thoughts); only the drawing is skipped.
+    if (window.Brain && window.Brain.progress >= 0.999) {
+      for (const n of neurons) n.flash *= Math.exp(-dt * 1.35);
+      for (const p of pulses) p.d += p.speed * dt;
+      const landed = pulses.filter((p) => p.d >= p.e.total);
+      pulses = pulses.filter((p) => p.d < p.e.total);
+      landed.forEach((p) => p.arrive());
+      rings = [];
+      requestAnimationFrame(frame);
+      return;
     }
 
     // Clamped so iOS overscroll bounce never reads outside the network canvas.
