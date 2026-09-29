@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/cosmos.css?v=5">
+  <link rel="stylesheet" href="assets/css/cosmos.css?v=6">
 </head>
 <body>
   <canvas id="cosmos" aria-hidden="true"></canvas>
@@ -39,15 +39,27 @@
       <div class="ornament"><span>✦</span></div>
     </header>
 
-    <section class="panel placeholder">
-      <h2>Archive awaiting entries</h2>
-      <p>Finished work will collect here, each with a short explanation and its code below, like the <a href="current-projects.html" data-veil>current projects</a> page.</p>
-    </section>
+    <div class="grid project-grid">
+      <a class="panel project-card" href="dcs357.html" data-veil>
+        <span class="card-kicker">Course project</span>
+        <h2>DCS357</h2>
+        <p>Decoding the visual brain: machine-learning classifiers that read which image category a subject saw from fMRI activity in ventral temporal cortex.</p>
+        <div class="tags"><span>fMRI</span><span>scikit-learn</span><span>Decoding</span></div>
+        <span class="card-go">View the code →</span>
+      </a>
+      <a class="panel project-card" href="tmr.html" data-veil>
+        <span class="card-kicker">Sleep &amp; memory</span>
+        <h2>Targeted Memory Reactivation (TMR)</h2>
+        <p>A PsychoPy and EEG experiment that replays sounds during a nap to strengthen specific spatial memories, in the style of Rudoy et al. (2009).</p>
+        <div class="tags"><span>PsychoPy</span><span>EEG</span><span>Sleep</span></div>
+        <span class="card-go">View the code →</span>
+      </a>
+    </div>
   </main>
 
   <footer class="foot">John Weigel · Neuroscience</footer>
   <div class="veil" aria-hidden="true"></div>
 
-  <script src="assets/js/cosmos.js?v=5"></script>
+  <script src="assets/js/cosmos.js?v=6"></script>
 </body>
 </html>

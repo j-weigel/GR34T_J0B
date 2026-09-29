@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DCS 357 · John Weigel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/cosmos.css?v=6">
+</head>
+<body>
+  <canvas id="cosmos" aria-hidden="true"></canvas>
+
+  <header class="crossbar">
+    <div class="brand">
+      <a class="sigil" href="index.html" data-veil>JW</a>
+      <div class="thoughts" title="One thought forms for every 10 synapses fired">
+        <span class="t-label">Thoughts:</span> <span class="t-count"></span><span class="t-nous">νοῦς ×2</span>
+      </div>
+    </div>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="modules">Modules</button>
+    <nav aria-label="Modules">
+      <ul id="modules">
+        <li><a class="mod" href="about.html" data-veil>About Me</a></li>
+        <li><a class="mod" href="past-projects.html" aria-current="page" data-veil>Past Projects</a></li>
+        <li><a class="mod" href="current-projects.html" data-veil>Current Projects</a></li>
+        <li><a class="mod" href="experience.html" data-veil>Experience</a></li>
+        <li><a class="mod" href="contact.html" data-veil>Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="page">
+    <p class="back"><a href="past-projects.html" data-veil>← Past Projects</a></p>
+    <header class="page-head">
+      <div class="kicker">Past Projects · DCS 357</div>
+      <h1>Decoding the Visual Brain</h1>
+      <p class="lede">Can you tell what someone is looking at from their brain activity alone? A machine-learning analysis of fMRI responses in ventral temporal cortex.</p>
+      <div class="ornament"><span>✦</span></div>
+    </header>
+
+    <section class="panel">
+      <h2>What it does</h2>
+      <p>The notebook analyzes the <strong>Haxby fMRI dataset</strong>: 864 trials in which a subject viewed faces, houses, cats, bottles, scissors, shoes, chairs, and scrambled images. Responses in <strong>ventral temporal cortex</strong> have been reduced to 50 principal components. The central question is whether the brain represents these categories in distinguishable patterns.</p>
+      <p>It works in three stages. First it <strong>explores</strong> how mean component scores differ by category and between animate and inanimate objects. Next it runs a <strong>supervised</strong> decoding task, training classifiers to tell whether the subject was viewing a face. Finally it takes an <strong>unsupervised</strong> look at how the categories arrange themselves in representational space.</p>
+      <div class="tags">
+        <span>Python</span><span>pandas</span><span>scikit-learn</span><span>seaborn</span><span>fMRI</span><span>Decoding</span>
+      </div>
+    </section>
+
+    <div class="grid">
+      <article class="panel">
+        <h3>Logistic Regression</h3>
+        <p>A linear classifier separating face from non-face trials. Across stratified 5-fold cross-validation it reached about <strong>99% accuracy</strong>.</p>
+        <span class="rule">P(face) = σ(w·x + b)</span>
+      </article>
+      <article class="panel">
+        <h3>k-Nearest Neighbors</h3>
+        <p>Labels a trial by majority vote of its closest neighbors in standardized PC space. A sweep over k shows how neighborhood size affects accuracy. In cross-validation it scored about <strong>98%</strong>, close behind the linear model.</p>
+        <span class="rule">ŷ = mode(y of k nearest)</span>
+      </article>
+      <article class="panel">
+        <h3>PCA &amp; t-SNE</h3>
+        <p>Two views of the same 50-dimensional space. PCA keeps the global linear structure: its first two components explain about 52% of the variance. t-SNE draws out local clusters by category.</p>
+        <span class="rule">50 PCs → 2D map</span>
+      </article>
+    </div>
+
+    <section class="panel">
+      <h2>What it shows</h2>
+      <p>Faces are strikingly easy to decode. A simple linear model separates them from every other category almost perfectly, which fits the well-known face-selective responses in ventral temporal cortex. The animate/inanimate split also shows up in the average component profiles, suggesting that the brain's representational space is organized by broad semantic dimensions as well as by individual categories.</p>
+      <p class="credit">A collaborative project (LB &amp; JW).</p>
+    </section>
+
+    <section class="code-space">
+      <h2 class="section">The Code</h2>
+      <p class="sub">The notebook itself, cell by cell, with its outputs.</p>
+      <div class="actions">
+        <a class="btn" href="assets/notebooks/CoNeu_LB+JW_Final.ipynb" download>✦ Download notebook</a>
+      </div>
+      <div data-notebook="dcs357-haxby"></div>
+    </section>
+  </main>
+
+  <footer class="foot">John Weigel · Neuroscience</footer>
+  <div class="veil" aria-hidden="true"></div>
+
+  <script>window.Prism = { manual: true };</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="assets/data/dcs357-haxby.js?v=6"></script>
+  <script src="assets/js/cosmos.js?v=6"></script>
+  <script src="assets/js/notebook.js?v=6"></script>
+</body>
+</html>

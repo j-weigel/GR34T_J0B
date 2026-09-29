@@ -1,12 +1,19 @@
-"""Export a Jupyter notebook into a data file the portfolio site can render.
+"""Export a Jupyter notebook or Python script into a data file the portfolio
+site can render.
 
 Usage (from the repo root):
     python3 tools/export_notebook.py EvoCompPlayground.ipynb evocomp-playground
+    python3 tools/export_notebook.py path/to/script.py some-slug
 
 Writes:
     docs/assets/data/<slug>.js           cell sources + text outputs
     docs/assets/img/<slug>/cell-XX-Y.png plot images from the notebook outputs
-    docs/assets/notebooks/<notebook>     a downloadable copy of the notebook
+    docs/assets/notebooks/<file>         a downloadable copy of the source
+
+A .py script becomes one code cell per section, split at comment banners:
+    # =====
+    # SECTION TITLE
+    # =====
 
 The data file is plain JavaScript (not JSON) so the site also works when
 opened straight from disk, where fetch() of local files is blocked.
@@ -14,6 +21,7 @@ opened straight from disk, where fetch() of local files is blocked.
 
 import base64
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -26,8 +34,35 @@ def text_of(value):
     return "".join(value) if isinstance(value, list) else (value or "")
 
 
+BANNER = re.compile(r"^# ?={10,}\n# ?(.+?)\n# ?={10,}\n", re.M)
+
+
+def script_cells(text):
+    """Split a script at its section banners: a heading, then that section's code."""
+    cells = []
+    pos = 0
+    title = None
+    for m in BANNER.finditer(text):
+        chunk = text[pos:m.start()].strip("\n")
+        if chunk:
+            if title:
+                cells.append({"type": "markdown", "source": f"## {title}"})
+            cells.append({"type": "code", "source": chunk, "outputs": []})
+        # Titles read like "CONFIG  ——  notes"; keep the part before the dash.
+        title = re.split(r"\s+[—–-]{1,2}\s+|\s{2,}", m.group(1).strip())[0].title()
+        pos = m.end()
+    chunk = text[pos:].strip("\n")
+    if chunk:
+        if title:
+            cells.append({"type": "markdown", "source": f"## {title}"})
+        cells.append({"type": "code", "source": chunk, "outputs": []})
+    return cells
+
+
 def export(notebook_path, slug):
     notebook_path = Path(notebook_path)
+    if notebook_path.suffix == ".py":
+        return export_script(notebook_path, slug)
     nb = json.loads(notebook_path.read_text(encoding="utf-8"))
 
     img_dir = DOCS / "assets" / "img" / slug
@@ -69,13 +104,23 @@ def export(notebook_path, slug):
 
         cells.append(entry)
 
+    write_payload(notebook_path, slug, cells, "notebook")
+
+
+def export_script(script_path, slug):
+    cells = script_cells(script_path.read_text(encoding="utf-8"))
+    write_payload(script_path, slug, cells, "script")
+
+
+def write_payload(source_path, slug, cells, kind):
     copy_dir = DOCS / "assets" / "notebooks"
     copy_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(notebook_path, copy_dir / notebook_path.name)
+    shutil.copy2(source_path, copy_dir / source_path.name)
 
     payload = {
-        "name": notebook_path.name,
-        "download": f"assets/notebooks/{notebook_path.name}",
+        "name": source_path.name,
+        "kind": kind,
+        "download": f"assets/notebooks/{source_path.name}",
         "cells": cells,
     }
     out_file = DOCS / "assets" / "data" / f"{slug}.js"

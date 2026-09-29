@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Targeted Memory Reactivation · John Weigel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/cosmos.css?v=6">
+</head>
+<body>
+  <canvas id="cosmos" aria-hidden="true"></canvas>
+
+  <header class="crossbar">
+    <div class="brand">
+      <a class="sigil" href="index.html" data-veil>JW</a>
+      <div class="thoughts" title="One thought forms for every 10 synapses fired">
+        <span class="t-label">Thoughts:</span> <span class="t-count"></span><span class="t-nous">νοῦς ×2</span>
+      </div>
+    </div>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="modules">Modules</button>
+    <nav aria-label="Modules">
+      <ul id="modules">
+        <li><a class="mod" href="about.html" data-veil>About Me</a></li>
+        <li><a class="mod" href="past-projects.html" aria-current="page" data-veil>Past Projects</a></li>
+        <li><a class="mod" href="current-projects.html" data-veil>Current Projects</a></li>
+        <li><a class="mod" href="experience.html" data-veil>Experience</a></li>
+        <li><a class="mod" href="contact.html" data-veil>Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="page">
+    <p class="back"><a href="past-projects.html" data-veil>← Past Projects</a></p>
+    <header class="page-head">
+      <div class="kicker">Past Projects · Sleep &amp; Memory</div>
+      <h1>Targeted Memory Reactivation</h1>
+      <p class="lede">Replaying a sound during sleep to strengthen one specific memory: an EEG-ready PsychoPy experiment in the style of Rudoy et al. (2009).</p>
+      <div class="ornament"><span>✦</span></div>
+    </header>
+
+    <section class="panel">
+      <h2>What it does</h2>
+      <p>Participants learn where each of a set of objects appears on screen, and each object is paired with a characteristic sound. Their spatial memory is tested before and after a <strong>nap</strong>. During slow-wave sleep, the sounds for half of the well-learned items are quietly <strong>replayed</strong>. If reactivation during sleep strengthens those memories, the cued items should be recalled more accurately afterward than the uncued ones.</p>
+      <p>The script runs the whole session phase by phase: <strong>study</strong>, a drag-to-location <strong>pre-test</strong>, a within-subject random <strong>cue assignment</strong>, operator-supervised <strong>cueing</strong> during sleep (with arousal flagging and settling intervals), and a matching <strong>post-test</strong>. Every phase writes its own CSV, so a crash mid-session never loses data.</p>
+      <div class="tags">
+        <span>Python</span><span>PsychoPy</span><span>EEG</span><span>EGI NetStation</span><span>Sleep</span><span>Memory</span>
+      </div>
+    </section>
+
+    <div class="grid">
+      <article class="panel">
+        <h3>Spatial memory measure</h3>
+        <p>Recall is scored as the distance in pixels between where the participant places the marker and where the object really was. The measure is the drop in error from pre- to post-test.</p>
+        <span class="rule">error = ‖response − target‖</span>
+      </article>
+      <article class="panel">
+        <h3>Cueing during sleep</h3>
+        <p>Cued sounds play in interleaved rounds at a low volume, with jittered 4.5–5.5 s gaps. The operator can flag arousals, classify them, and let the participant settle before cues resume.</p>
+        <span class="rule">cued vs. uncued, within subject</span>
+      </article>
+      <article class="panel">
+        <h3>EEG triggers</h3>
+        <p>Events are time-stamped to EGI NetStation, with 4-character codes for study, test, cue, and arousal events. Visual onsets are locked to the screen refresh.</p>
+        <span class="rule">STDI · CUE+ · ARSL · POSR</span>
+      </article>
+    </div>
+
+    <section class="panel">
+      <h2>My adaptation</h2>
+      <p>I built my version from a starter paradigm and adapted it for our lab's EEG setup:</p>
+      <ul class="changes">
+        <li>Moved to the newer <strong>egi_pynetstation</strong> API, with the iohub keyboard backend so key handling doesn't interfere with the NetStation connection.</li>
+        <li>Resync the amplifier clock before every phase, trial, and cue, so triggers stay aligned and the connection never goes idle.</li>
+        <li>Made visual triggers <strong>screen-synced</strong>, firing on the exact frame the stimulus appears.</li>
+        <li>Automatically route audio to the lab computer's headphones, falling back to the default device on any other machine.</li>
+        <li>Switched to a new stimulus set with a wider reference grid.</li>
+      </ul>
+    </section>
+
+    <section class="code-space">
+      <h2 class="section">The Code</h2>
+      <p class="sub">My adapted experiment script, section by section.</p>
+      <div class="actions">
+        <a class="btn" href="assets/notebooks/AlphaWaves_RudoyStyle_ShortTerm26_v2.py" download>✦ Download script</a>
+      </div>
+      <div data-notebook="tmr-alphawaves-v2"></div>
+
+      <h2 class="section">The Original Template</h2>
+      <p class="sub">The starter paradigm this version was adapted from, for comparison.</p>
+      <div class="actions">
+        <a class="btn" href="assets/notebooks/tmr_object_location_sound.py" download>✦ Download template</a>
+      </div>
+      <div data-notebook="tmr-template"></div>
+    </section>
+  </main>
+
+  <footer class="foot">John Weigel · Neuroscience</footer>
+  <div class="veil" aria-hidden="true"></div>
+
+  <script>window.Prism = { manual: true };</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="assets/data/tmr-alphawaves-v2.js?v=6"></script>
+  <script src="assets/data/tmr-template.js?v=6"></script>
+  <script src="assets/js/cosmos.js?v=6"></script>
+  <script src="assets/js/notebook.js?v=6"></script>
+</body>
+</html>

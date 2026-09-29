@@ -17,17 +17,18 @@
   const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
   // Minimal markdown: headings and paragraphs are all these notebooks use.
-  function markdown(src, toc, used) {
+  function markdown(src, toc, used, prefix) {
     const out = [];
     let para = [];
     const flush = () => { if (para.length) { out.push(`<p>${inline(para.join(" "))}</p>`); para = []; } };
     for (const line of src.split("\n")) {
-      const h = /^(#{1,6})\s+(.*)$/.exec(line);
+      // Colab-style headings may omit the space and wrap the title in emphasis: #***Title***
+      const h = /^(#{1,6})\s*(.+)$/.exec(line);
       if (h) {
         flush();
-        const text = h[2].replace(/:\s*$/, "");
+        const text = h[2].replace(/^\*+|\*+$/g, "").replace(/:\s*$/, "").trim();
         if (h[1].length <= 2) {
-          let id = slug(text) || "section";
+          let id = prefix + "-" + (slug(text) || "section");
           while (used.has(id)) id += "-";
           used.add(id);
           toc.push({ id, text });
@@ -35,7 +36,7 @@
         } else {
           out.push(`<h4>${inline(text)}</h4>`);
         }
-      } else if (!line.trim()) {
+      } else if (/^\s*(-{3,}|\*{3,})\s*$/.test(line) || !line.trim()) {
         flush();
       } else {
         para.push(line.trim());
@@ -55,7 +56,7 @@
     const used = new Set();
     let codeIndex = 0;
     const html = nb.cells.map((cell) => {
-      if (cell.type === "markdown") return `<div class="nb-md">${markdown(cell.source, toc, used)}</div>`;
+      if (cell.type === "markdown") return `<div class="nb-md">${markdown(cell.source, toc, used, host.dataset.notebook)}</div>`;
       if (cell.type !== "code") return "";
       codeIndex++;
       const outs = (cell.outputs || []).map((o) =>
@@ -64,7 +65,7 @@
           : `<pre>${esc(o.text.replace(/\n+$/, ""))}</pre>`
       ).join("");
       return `<div class="nb-cell">
-        <div class="bar"><span>In [${codeIndex}]</span><button class="copy" type="button">copy</button></div>
+        <div class="bar"><span>${nb.kind === "script" ? esc(nb.name) : `In [${codeIndex}]`}</span><button class="copy" type="button">copy</button></div>
         <pre><code class="language-python">${esc(cell.source)}</code></pre>
         ${outs ? `<div class="nb-out"><div class="tag">OUT</div>${outs}</div>` : ""}
       </div>`;

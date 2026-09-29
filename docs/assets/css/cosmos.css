@@ -683,3 +683,51 @@ body.brain-open .brain-hint { opacity: 1; }
   .brain-hint { font-size: 0.52rem; letter-spacing: 0.18em; bottom: 64px; }
   .zoom-toggle { right: 12px; bottom: 14px; }
 }
+
+/* ---- Project cards & project-page extras ------------------------------ */
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.35s, box-shadow 0.35s, transform 0.35s;
+}
+.project-card:hover,
+.project-card:focus-visible {
+  border-color: rgba(127, 216, 255, 0.5);
+  box-shadow: var(--glow), inset 0 0 40px rgba(75, 47, 168, 0.18);
+  transform: translateY(-2px);
+  outline: none;
+}
+.project-card h2 { margin-top: 6px; }
+.card-kicker {
+  font-family: var(--font-head);
+  font-size: 0.62rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.card-go {
+  margin-top: auto;
+  padding-top: 16px;
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+}
+.back { margin: 0 0 8px; }
+.back a {
+  font-family: var(--font-head);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-faint);
+}
+.back a:hover { color: var(--cyan); }
+.credit { font-style: italic; color: var(--ink-faint) !important; }
+.changes { margin: 0; padding-left: 1.2em; color: var(--ink-soft); }
+.changes li { margin-bottom: 6px; }
+.changes li::marker { content: "✦  "; color: var(--violet); }
