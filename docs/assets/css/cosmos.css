@@ -93,61 +93,32 @@ a { color: var(--cyan); }
 .brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
 
 .thoughts {
-  position: relative;
   display: flex;
   align-items: baseline;
-  gap: 7px;
-  padding: 4px 12px 7px;
-  border: 1px solid var(--panel-edge);
-  border-radius: 999px;
-  background: rgba(10, 7, 24, 0.55);
+  gap: 6px;
   font-family: var(--font-head);
-  font-size: 0.6rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
   color: var(--ink-faint);
   white-space: nowrap;
   cursor: default;
-  transition: border-color 0.4s, box-shadow 0.4s;
 }
 .t-count {
-  font-size: 0.82rem;
+  min-width: 1ch;
+  font-size: 0.86rem;
   letter-spacing: 0.04em;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
-.t-bar {
-  position: absolute;
-  left: 12px; right: 12px; bottom: 3px;
-  height: 1px;
-  background: rgba(155, 123, 255, 0.16);
-  overflow: hidden;
-}
-.t-bar i {
-  display: block;
-  height: 100%;
-  width: var(--p, 0%);
-  background: var(--cyan);
-  box-shadow: 0 0 6px var(--cyan);
-  transition: width 0.35s ease;
-}
-.t-nous { display: none; color: var(--gold); letter-spacing: 0.12em; text-transform: none; font-size: 0.72rem; }
+.t-nous { display: none; margin-left: 6px; color: var(--gold); font-size: 0.72rem; letter-spacing: 0.1em; }
 
 .thoughts.bump .t-count { animation: thought 0.9s ease-out; }
 @keyframes thought {
   0% { color: #fff; text-shadow: 0 0 10px #fff, 0 0 22px var(--cyan), 0 0 40px var(--violet); }
   100% { text-shadow: none; }
 }
-.thoughts.nous {
-  border-color: rgba(243, 217, 164, 0.7);
-  box-shadow: 0 0 14px rgba(243, 217, 164, 0.4), inset 0 0 10px rgba(243, 217, 164, 0.15);
-}
+.thoughts.nous .t-count { color: var(--gold); text-shadow: 0 0 10px rgba(243, 217, 164, 0.6); }
 .thoughts.nous .t-nous { display: inline; animation: breathe 0.9s ease-in-out infinite; }
-.thoughts.nous .t-bar i { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
-
-@media (max-width: 480px) {
-  .t-label { display: none; }
-}
 
 .crossbar ul {
   list-style: none;

@@ -50,6 +50,9 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
+  // Canvas colors must use plain decimals: Safari rejects alphas that
+  // stringify in exponent form (e.g. "1e-7"), which would halt the loop.
+  const al = (v) => Math.max(0, Math.min(1, v)).toFixed(3);
   const rand = (a, b) => a + Math.random() * (b - a);
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -200,8 +203,8 @@
   // ---- Rendering neurons to sprites ----------------------------------------
 
   const DARK = {
-    body: (d) => `rgba(50,40,104,${0.92 - d * 0.12})`,
-    hl: (d) => `rgba(128,110,205,${0.42 - d * 0.07})`,
+    body: (d) => `rgba(50,40,104,${al(0.92 - d * 0.12)})`,
+    hl: (d) => `rgba(128,110,205,${al(0.42 - d * 0.07)})`,
     spine: "rgba(104,90,182,0.38)",
     soma: [[0, "#3b3176"], [0.5, "#211a4b"], [1, "#0e0a23"]],
     rim: "rgba(150,130,235,0.38)",
@@ -211,8 +214,8 @@
     nucleolus: "rgba(160,140,235,0.45)",
   };
   const LIT = {
-    body: (d) => `rgba(112,140,255,${0.95 - d * 0.1})`,
-    hl: (d) => `rgba(215,238,255,${0.95 - d * 0.12})`,
+    body: (d) => `rgba(112,140,255,${al(0.95 - d * 0.1)})`,
+    hl: (d) => `rgba(215,238,255,${al(0.95 - d * 0.12)})`,
     spine: "rgba(190,222,255,0.85)",
     soma: [[0, "#fffaf0"], [0.28, "#e4dbff"], [0.62, "#9b7bff"], [1, "#4b2fa8"]],
     rim: "rgba(205,235,255,0.95)",
@@ -741,7 +744,7 @@
         const d0 = p.d - (p.trail * k) / steps, d1 = p.d - (p.trail * (k + 1)) / steps;
         if (d0 <= 0) break;
         const f = 1 - k / steps;
-        ctx.strokeStyle = `rgba(${Math.round(160 + 60 * f)},${Math.round(200 + 30 * f)},255,${f * f * 0.9})`;
+        ctx.strokeStyle = `rgba(${Math.round(160 + 60 * f)},${Math.round(200 + 30 * f)},255,${al(f * f * 0.9)})`;
         ctx.lineWidth = (0.6 + 2.2 * f) * S;
         const a0 = pos(Math.max(0, d1)), a1 = pos(d0);
         strokeRange(ctx, e, Math.min(a0, a1), Math.max(a0, a1));
@@ -750,7 +753,7 @@
         const behind = p.d - (p.forward ? nd : e.total - nd);
         if (behind < 0 || behind > 160 * S) continue;
         const [x, y] = pointAt(e, nd);
-        glowDot(x, y, 7 * S, `rgba(243,217,164,${0.8 * Math.exp(-behind / (45 * S))})`);
+        glowDot(x, y, 7 * S, `rgba(243,217,164,${al(0.8 * Math.exp(-behind / (45 * S)))})`);
       }
       const [hx, hy] = pointAt(e, pos(Math.min(p.d, e.total)));
       glowDot(hx, hy, 11 * S, window.Mind && window.Mind.nous ? "rgba(255,230,170,0.95)" : "rgba(235,248,255,0.95)");
@@ -765,8 +768,8 @@
       if (n.act < 0.03) continue;
       const r = n.R * 4;
       const g = ctx.createRadialGradient(n.x, n.y, n.R * 0.4, n.x, n.y, r);
-      g.addColorStop(0, `rgba(155,123,255,${0.32 * n.act * n.depth})`);
-      g.addColorStop(0.4, `rgba(127,216,255,${0.1 * n.act * n.depth})`);
+      g.addColorStop(0, `rgba(155,123,255,${al(0.32 * n.act * n.depth)})`);
+      g.addColorStop(0.4, `rgba(127,216,255,${al(0.1 * n.act * n.depth)})`);
       g.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, TAU); ctx.fill();
@@ -775,7 +778,7 @@
       r.age += dt;
       const k = r.age / 1.2;
       if (k >= 1 || r.s <= 0) continue;
-      ctx.strokeStyle = `rgba(190,170,255,${(1 - k) * 0.45 * r.s})`;
+      ctx.strokeStyle = `rgba(190,170,255,${al((1 - k) * 0.45 * r.s)})`;
       ctx.lineWidth = 1.4 * S * (1 - k) + 0.3;
       ctx.beginPath(); ctx.arc(r.x, r.y, r.R * (1.1 + k * 3), 0, TAU); ctx.stroke();
     }

@@ -22,6 +22,9 @@
   let mouse = { x: 0.5, y: 0.5, sx: 0.5, sy: 0.5 };
   let last = performance.now();
 
+  // Canvas colors must use plain decimals: Safari rejects alphas that
+  // stringify in exponent form (e.g. "1e-7"), which would halt the loop.
+  const al = (v) => Math.max(0, Math.min(1, v)).toFixed(3);
   const rand = (a, b) => a + Math.random() * (b - a);
   const gauss = () => {
     let u = 0, v = 0;
@@ -84,7 +87,7 @@
       if (Math.random() < core * 0.5) [cr, cg, cb] = [201, 163, 106];
       const a = rand(0.007, 0.024) * (0.45 + core);
       const grad = g.createRadialGradient(x, y, 0, x, y, r);
-      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${a})`);
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${al(a)})`);
       grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
       g.fillStyle = grad;
       g.beginPath();
@@ -131,7 +134,7 @@
       const r = Math.random() < 0.97 ? rand(0.2, 0.8) : rand(0.8, 1.5);
       const hue = Math.random();
       const col = hue < 0.6 ? "255,255,255" : hue < 0.82 ? "190,210,255" : "255,226,190";
-      g.fillStyle = `rgba(${col},${rand(0.25, 0.9)})`;
+      g.fillStyle = `rgba(${col},${al(rand(0.25, 0.9))})`;
       g.beginPath();
       g.arc(x, y, r, 0, Math.PI * 2);
       g.fill();
@@ -215,10 +218,10 @@
       const ax = Math.cos(q.angle) * sep, ay = Math.sin(q.angle) * sep;
       const a = fadeIn * (p < 0.85 ? 0.8 : 0);
       for (const s of [1, -1]) {
-        dot(q.x + ax * s, q.y + ay * s, 1.3, `rgba(${r},${gC},${bC},${a})`, 6);
+        dot(q.x + ax * s, q.y + ay * s, 1.3, `rgba(${r},${gC},${bC},${al(a)})`, 6);
       }
       if (a > 0) {
-        ctx.strokeStyle = `rgba(${r},${gC},${bC},${a * 0.18})`;
+        ctx.strokeStyle = `rgba(${r},${gC},${bC},${al(a * 0.18)})`;
         ctx.lineWidth = 0.6;
         ctx.beginPath();
         ctx.moveTo(q.x - ax, q.y - ay);
@@ -232,7 +235,7 @@
     if (p < collapseAt) {
       // Superposition: ghosts shimmer inside a faint probability cloud.
       const cloud = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.spread * 2.2);
-      cloud.addColorStop(0, `rgba(${r},${gC},${bC},${0.07 * fadeIn})`);
+      cloud.addColorStop(0, `rgba(${r},${gC},${bC},${al(0.07 * fadeIn)})`);
       cloud.addColorStop(1, `rgba(${r},${gC},${bC},0)`);
       ctx.fillStyle = cloud;
       ctx.beginPath();
@@ -243,7 +246,7 @@
         const gx = q.x + (gh.ox + jitter) * q.spread;
         const gy = q.y + (gh.oy - jitter) * q.spread;
         const flick = 0.35 + 0.35 * Math.sin(t * 13 + gh.ph * 3);
-        dot(gx, gy, 1.1, `rgba(${r},${gC},${bC},${flick * fadeIn})`, 5);
+        dot(gx, gy, 1.1, `rgba(${r},${gC},${bC},${al(flick * fadeIn)})`, 5);
       }
     } else {
       flash(q, (p - collapseAt) / (1 - collapseAt));
@@ -254,8 +257,8 @@
     // Collapse: a single point surges, a ring expands, and it is gone.
     const [r, gC, bC] = q.hue;
     const a = 1 - k;
-    dot(q.x, q.y, 1.6 + (1 - k) * 1.2, `rgba(255,255,255,${a})`, 10);
-    ctx.strokeStyle = `rgba(${r},${gC},${bC},${a * 0.5})`;
+    dot(q.x, q.y, 1.6 + (1 - k) * 1.2, `rgba(255,255,255,${al(a)})`, 10);
+    ctx.strokeStyle = `rgba(${r},${gC},${bC},${al(a * 0.5)})`;
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.arc(q.x, q.y, 2 + k * q.spread * 1.8, 0, Math.PI * 2);
@@ -308,7 +311,7 @@
 
     for (const s of twinklers) {
       const a = 0.15 + 0.6 * Math.pow(0.5 + 0.5 * Math.sin(t * s.speed + s.phase), 3);
-      ctx.fillStyle = `rgba(230,235,255,${a})`;
+      ctx.fillStyle = `rgba(230,235,255,${al(a)})`;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
@@ -319,7 +322,7 @@
       m.x = (m.x + m.vx * dt + w) % w;
       m.y = (m.y + m.vy * dt + h) % h;
       const a = 0.18 + 0.14 * Math.sin(t * 0.7 + m.phase);
-      dot(m.x, m.y, m.r, `rgba(${m.hue},${a})`, 4);
+      dot(m.x, m.y, m.r, `rgba(${m.hue},${al(a)})`, 4);
     }
 
     if (!reduceMotion) {
@@ -362,10 +365,10 @@
   }
 
   // ---- Thought counter ------------------------------------------------------
-  // Every 10 exchanges between neurons form one thought. Clicking neurons 20
-  // times within 10 seconds enters nous, which doubles each new thought for
-  // as long as the clicking keeps up. The count is kept in localStorage so it
-  // follows the visitor across pages and visits.
+  // Every 10 synapses fired between neurons form one thought. Clicking neurons
+  // 20 times within 10 seconds enters nous, which doubles each new thought for
+  // as long as the clicking keeps up. The count lives in sessionStorage: it
+  // follows the visitor across pages and starts over on each new visit.
 
   const Mind = (function () {
     const KEY = "jw.thoughts";
@@ -376,7 +379,7 @@
     let clicks = [], nousTimer = null, bumpTimer = null;
 
     try {
-      const saved = JSON.parse(localStorage.getItem(KEY));
+      const saved = JSON.parse(sessionStorage.getItem(KEY));
       if (saved && Number.isFinite(saved.thoughts)) {
         thoughts = Math.max(0, Math.floor(saved.thoughts));
         exchanges = clamp0(Math.floor(saved.exchanges) || 0, PER_THOUGHT - 1);
@@ -386,14 +389,12 @@
     function clamp0(v, max) { return Math.max(0, Math.min(max, v)); }
 
     function save() {
-      try { localStorage.setItem(KEY, JSON.stringify({ thoughts, exchanges })); } catch (e) { /* ignore */ }
+      try { sessionStorage.setItem(KEY, JSON.stringify({ thoughts, exchanges })); } catch (e) { /* ignore */ }
     }
 
     function render(bump) {
       if (!el) return;
-      el.querySelector(".t-count").textContent = thoughts.toLocaleString();
-      el.querySelector(".t-label").textContent = thoughts === 1 ? "thought" : "thoughts";
-      el.style.setProperty("--p", (exchanges / PER_THOUGHT) * 100 + "%");
+      el.querySelector(".t-count").textContent = thoughts ? thoughts.toLocaleString() : "";
       el.classList.toggle("nous", nous);
       document.body.classList.toggle("nous", nous);
       if (bump) {
