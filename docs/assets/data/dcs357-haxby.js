@@ -77,7 +77,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-10-0.png"
+     "src": "assets/img/dcs357-haxby/cell-10-0.png",
+     "width": 695,
+     "height": 393
     }
    ]
   },
@@ -97,7 +99,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-12-0.png"
+     "src": "assets/img/dcs357-haxby/cell-12-0.png",
+     "width": 986,
+     "height": 569
     }
    ]
   },
@@ -107,7 +111,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-13-0.png"
+     "src": "assets/img/dcs357-haxby/cell-13-0.png",
+     "width": 999,
+     "height": 547
     }
    ]
   },
@@ -117,7 +123,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-14-0.png"
+     "src": "assets/img/dcs357-haxby/cell-14-0.png",
+     "width": 711,
+     "height": 473
     }
    ]
   },
@@ -127,7 +135,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-15-0.png"
+     "src": "assets/img/dcs357-haxby/cell-15-0.png",
+     "width": 689,
+     "height": 473
     }
    ]
   },
@@ -137,7 +147,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-16-0.png"
+     "src": "assets/img/dcs357-haxby/cell-16-0.png",
+     "width": 698,
+     "height": 547
     }
    ]
   },
@@ -161,7 +173,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-19-0.png"
+     "src": "assets/img/dcs357-haxby/cell-19-0.png",
+     "width": 908,
+     "height": 318
     }
    ]
   },
@@ -215,7 +229,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-25-0.png"
+     "src": "assets/img/dcs357-haxby/cell-25-0.png",
+     "width": 555,
+     "height": 455
     }
    ]
   },
@@ -234,7 +250,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-27-1.png"
+     "src": "assets/img/dcs357-haxby/cell-27-1.png",
+     "width": 578,
+     "height": 455
     }
    ]
   },
@@ -268,7 +286,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-31-0.png"
+     "src": "assets/img/dcs357-haxby/cell-31-0.png",
+     "width": 698,
+     "height": 547
     }
    ]
   },
@@ -283,7 +303,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-33-0.png"
+     "src": "assets/img/dcs357-haxby/cell-33-0.png",
+     "width": 678,
+     "height": 528
     }
    ]
   },
@@ -297,7 +319,9 @@ window.NOTEBOOKS["dcs357-haxby"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/dcs357-haxby/cell-34-1.png"
+     "src": "assets/img/dcs357-haxby/cell-34-1.png",
+     "width": 1008,
+     "height": 585
     }
    ]
   }

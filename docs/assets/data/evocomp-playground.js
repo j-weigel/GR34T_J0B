@@ -1,6 +1,7 @@
 window.NOTEBOOKS = window.NOTEBOOKS || {};
 window.NOTEBOOKS["evocomp-playground"] = {
  "name": "EvoCompPlayground.ipynb",
+ "kind": "notebook",
  "download": "assets/notebooks/EvoCompPlayground.ipynb",
  "cells": [
   {
@@ -13,7 +14,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-01-0.png"
+     "src": "assets/img/evocomp-playground/cell-01-0.png",
+     "width": 574,
+     "height": 455
     }
    ]
   },
@@ -31,15 +34,21 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-03-1.png"
+     "src": "assets/img/evocomp-playground/cell-03-1.png",
+     "width": 853,
+     "height": 547
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-03-2.png"
+     "src": "assets/img/evocomp-playground/cell-03-2.png",
+     "width": 853,
+     "height": 547
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-03-3.png"
+     "src": "assets/img/evocomp-playground/cell-03-3.png",
+     "width": 853,
+     "height": 547
     }
    ]
   },
@@ -57,7 +66,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-05-1.png"
+     "src": "assets/img/evocomp-playground/cell-05-1.png",
+     "width": 853,
+     "height": 547
     },
     {
      "kind": "text",
@@ -65,7 +76,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-05-3.png"
+     "src": "assets/img/evocomp-playground/cell-05-3.png",
+     "width": 853,
+     "height": 547
     },
     {
      "kind": "text",
@@ -73,7 +86,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-05-5.png"
+     "src": "assets/img/evocomp-playground/cell-05-5.png",
+     "width": 853,
+     "height": 547
     }
    ]
   },
@@ -147,11 +162,15 @@ window.NOTEBOOKS["evocomp-playground"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-18-0.png"
+     "src": "assets/img/evocomp-playground/cell-18-0.png",
+     "width": 411,
+     "height": 398
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-18-1.png"
+     "src": "assets/img/evocomp-playground/cell-18-1.png",
+     "width": 570,
+     "height": 438
     }
    ]
   },
@@ -207,7 +226,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-25-1.png"
+     "src": "assets/img/evocomp-playground/cell-25-1.png",
+     "width": 566,
+     "height": 438
     }
    ]
   },
@@ -221,7 +242,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
    "outputs": [
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-28-0.png"
+     "src": "assets/img/evocomp-playground/cell-28-0.png",
+     "width": 693,
+     "height": 547
     }
    ]
   },
@@ -259,7 +282,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-32-1.png"
+     "src": "assets/img/evocomp-playground/cell-32-1.png",
+     "width": 784,
+     "height": 624
     }
    ]
   },
@@ -273,7 +298,9 @@ window.NOTEBOOKS["evocomp-playground"] = {
     },
     {
      "kind": "image",
-     "src": "assets/img/evocomp-playground/cell-33-1.png"
+     "src": "assets/img/evocomp-playground/cell-33-1.png",
+     "width": 784,
+     "height": 624
     }
    ]
   }

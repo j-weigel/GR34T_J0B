@@ -23,6 +23,7 @@ import base64
 import json
 import re
 import shutil
+import struct
 import sys
 from pathlib import Path
 
@@ -87,8 +88,13 @@ def export(notebook_path, slug):
                     outputs.append({"kind": "text", "text": text_of(out.get("text"))})
                 elif "image/png" in data:
                     name = f"cell-{index:02d}-{out_index}.png"
-                    (img_dir / name).write_bytes(base64.b64decode(data["image/png"]))
-                    outputs.append({"kind": "image", "src": f"assets/img/{slug}/{name}"})
+                    png = base64.b64decode(data["image/png"])
+                    (img_dir / name).write_bytes(png)
+                    # PNG IHDR holds the pixel size; the page reserves that space
+                    # up front so lazy-loaded plots never shift the layout.
+                    width, height = struct.unpack(">II", png[16:24])
+                    outputs.append({"kind": "image", "src": f"assets/img/{slug}/{name}",
+                                    "width": width, "height": height})
                 elif "text/plain" in data and kind == "execute_result":
                     outputs.append({"kind": "text", "text": text_of(data["text/plain"])})
                 elif kind == "error":

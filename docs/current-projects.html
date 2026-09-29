@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/cosmos.css?v=6">
+  <link rel="stylesheet" href="assets/css/cosmos.css?v=8">
 </head>
 <body>
   <canvas id="cosmos" aria-hidden="true"></canvas>
@@ -33,73 +33,31 @@
 
   <main class="page">
     <header class="page-head">
-      <div class="kicker">Current Projects · DCS 340</div>
-      <h1>EvoComp Playground</h1>
-      <p class="lede">An exploration of the classic optimization methods that come before evolutionary computing: how you find the top of a hill when you can only feel the ground under your feet.</p>
+      <div class="kicker">Module III</div>
+      <h1>Current Projects</h1>
       <div class="ornament"><span>✦</span></div>
     </header>
 
-    <section class="panel">
-      <h2>What it does</h2>
-      <p>The playground is a Python notebook built with <strong>NumPy</strong>, <strong>Matplotlib</strong>, and <strong>SciPy</strong>. It sets up a series of surfaces and runs different optimizers across them to compare how each one searches.</p>
-      <p>It starts with the <strong>pumpkin problem</strong>: find the highest point of a launched pumpkin's arc, <code>f(x) = 10 − (x − 5)²</code>. From there it adds a <strong>bumpy, multi-peaked surface</strong> where the starting point decides which peak you end up on, a <strong>learning-rate experiment</strong> that shows steps that are too small crawling and steps that are too large overshooting, and finally <strong>two-dimensional terrains</strong> such as <code>(x² − 2)² − xy + (y² − 3)²</code>, which has more than one valley.</p>
-      <div class="tags">
-        <span>Python</span><span>NumPy</span><span>SciPy</span><span>Matplotlib</span><span>Optimization</span><span>Jupyter</span>
-      </div>
-    </section>
-
-    <div class="grid">
-      <article class="panel">
-        <h3>Guess &amp; Check</h3>
-        <p>The baseline. Evaluate the surface at a list of candidate points and keep the best one. It's simple, but it only finds what you happened to test.</p>
-        <span class="rule">x* = argmax f(xᵢ)</span>
-      </article>
-      <article class="panel">
-        <h3>Gradient Ascent / Descent</h3>
-        <p>Step in the direction the slope points, scaled by a learning rate. The notebook runs it from several starting points on the bumpy surface and in 2D.</p>
-        <span class="rule">x ← x + α·f′(x) &nbsp;·&nbsp; v ← v − α·∇f(v)</span>
-      </article>
-      <article class="panel">
-        <h3>Bisection</h3>
-        <p>Looks for the peak by finding where the derivative crosses zero. Each step halves a bracket whose ends have slopes of opposite sign. It's slow, but it always converges.</p>
-        <span class="rule">f′(a)·f′(m) &lt; 0 ⇒ b ← m, else a ← m</span>
-      </article>
-      <article class="panel">
-        <h3>Newton's Method</h3>
-        <p>Uses curvature as well as slope. On a quadratic it lands on the optimum in a single step. In 2D it solves against the Hessian.</p>
-        <span class="rule">x ← x − f′(x)/f″(x) &nbsp;·&nbsp; v ← v − H⁻¹∇f</span>
-      </article>
-      <article class="panel">
-        <h3>Nelder–Mead</h3>
-        <p>A search that needs no derivatives. A triangle (simplex) reflects, expands, contracts, and shrinks its way downhill. There's both SciPy's version and a hand-written one that logs every step, with two starting points that settle into two different minima.</p>
-        <span class="rule">reflect → expand → contract → shrink</span>
-      </article>
+    <div class="grid project-grid">
+      <a class="panel project-card" href="dcs340.html" data-veil>
+        <span class="card-kicker">Course project</span>
+        <h2>DCS340</h2>
+        <p>EvoComp Playground: classic optimization methods (gradient ascent and descent, bisection, Newton's method, Nelder–Mead), with evolutionary computing to come.</p>
+        <div class="tags"><span>Optimization</span><span>NumPy</span><span>SciPy</span></div>
+        <span class="card-go">View the code →</span>
+      </a>
+      <a class="panel project-card" href="thesis.html" data-veil>
+        <span class="card-kicker">In progress</span>
+        <h2>Thesis</h2>
+        <p>My undergraduate thesis. Details coming soon.</p>
+        <span class="card-go">Enter →</span>
+      </a>
     </div>
-
-    <section class="panel">
-      <h2>What the experiments show</h2>
-      <p><strong>Newton's method</strong> was the fastest on the smooth pumpkin surface. <strong>Gradient ascent</strong> is the workhorse of machine learning, but it depends on its learning rate and starting point. <strong>Bisection</strong> is the most dependable when all you can do is check which way the slope points.</p>
-      <p>On surfaces with several optima, every method here is <em>local</em>. The answer depends on where you begin. That limitation is what motivates the population-based, evolutionary approaches the course builds toward.</p>
-    </section>
-
-    <section class="code-space">
-      <h2 class="section">The Code</h2>
-      <p class="sub">The notebook itself, cell by cell, with its outputs.</p>
-      <div class="actions">
-        <a class="btn" href="assets/notebooks/EvoCompPlayground.ipynb" download>✦ Download notebook</a>
-      </div>
-      <div data-notebook="evocomp-playground"></div>
-    </section>
   </main>
 
-  <footer class="foot">John Weigel · Neuroscience</footer>
+  <footer class="foot">John Weigel</footer>
   <div class="veil" aria-hidden="true"></div>
 
-  <script>window.Prism = { manual: true };</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-  <script src="assets/data/evocomp-playground.js?v=6"></script>
-  <script src="assets/js/cosmos.js?v=6"></script>
-  <script src="assets/js/notebook.js?v=6"></script>
+  <script src="assets/js/cosmos.js?v=8"></script>
 </body>
 </html>

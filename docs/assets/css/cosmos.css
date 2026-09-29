@@ -550,6 +550,7 @@ main.page {
 .nb-out img {
   display: block;
   max-width: 100%;
+  height: auto;
   margin: 8px auto;
   border-radius: 10px;
   background: #fff;
@@ -731,3 +732,63 @@ body.brain-open .brain-hint { opacity: 1; }
 .changes { margin: 0; padding-left: 1.2em; color: var(--ink-soft); }
 .changes li { margin-bottom: 6px; }
 .changes li::marker { content: "✦  "; color: var(--violet); }
+
+/* ---- Multi-part project pages ---------------------------------------- */
+
+.part-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.part-nav a {
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(155, 123, 255, 0.3);
+  background: rgba(10, 7, 24, 0.5);
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-soft);
+  transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.part-nav a:hover, .part-nav a:focus-visible {
+  color: #fff;
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(127, 216, 255, 0.3);
+  outline: none;
+}
+.part-head {
+  text-align: center;
+  margin: 72px 0 26px;
+  scroll-margin-top: calc(var(--nav-h) + 20px);
+}
+.part-head:first-of-type { margin-top: 24px; }
+.part-head .kicker {
+  font-family: var(--font-head);
+  font-size: 0.66rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.part-head h2 {
+  margin: 8px 0 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+  line-height: 1.15;
+  text-shadow: 0 0 16px rgba(155, 123, 255, 0.7), 0 0 40px rgba(127, 216, 255, 0.25);
+}
+.part-head .ornament { margin-top: 16px; }
+.part-lede {
+  max-width: 640px;
+  margin: 0 auto 32px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

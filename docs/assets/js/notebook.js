@@ -61,7 +61,7 @@
       codeIndex++;
       const outs = (cell.outputs || []).map((o) =>
         o.kind === "image"
-          ? `<img src="${esc(o.src)}" alt="Plot output of cell ${codeIndex}" loading="lazy">`
+          ? `<img src="${esc(o.src)}" alt="Plot output of cell ${codeIndex}" loading="lazy"${o.width ? ` width="${o.width}" height="${o.height}"` : ""}>`
           : `<pre>${esc(o.text.replace(/\n+$/, ""))}</pre>`
       ).join("");
       return `<div class="nb-cell">
