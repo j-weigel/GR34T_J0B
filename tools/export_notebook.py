@@ -8,6 +8,7 @@ Usage (from the repo root):
 Writes:
     docs/assets/data/<slug>.js           cell sources + text outputs
     docs/assets/img/<slug>/cell-XX-Y.png plot images from the notebook outputs
+    docs/assets/html/<slug>/cell-XX-Y.html HTML outputs, e.g. matplotlib animations
     docs/assets/notebooks/<file>         a downloadable copy of the source
 
 A .py script becomes one code cell per section, split at comment banners:
@@ -70,6 +71,9 @@ def export(notebook_path, slug):
     if img_dir.exists():
         shutil.rmtree(img_dir)
     img_dir.mkdir(parents=True)
+    html_dir = DOCS / "assets" / "html" / slug
+    if html_dir.exists():
+        shutil.rmtree(html_dir)
 
     cells = []
     for index, cell in enumerate(nb.get("cells", [])):
@@ -95,7 +99,26 @@ def export(notebook_path, slug):
                     width, height = struct.unpack(">II", png[16:24])
                     outputs.append({"kind": "image", "src": f"assets/img/{slug}/{name}",
                                     "width": width, "height": height})
-                elif "text/plain" in data and kind == "execute_result":
+                elif "text/html" in data and "Animation(" in text_of(data["text/html"]):
+                    # A matplotlib to_jshtml() animation: a self-contained page
+                    # the site shows in a lazy-loaded frame.
+                    html_dir.mkdir(parents=True, exist_ok=True)
+                    html = text_of(data["text/html"]).replace(
+                        "https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css",
+                        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css")
+                    name = f"cell-{index:02d}-{out_index}.html"
+                    (html_dir / name).write_text(
+                        '<!doctype html><meta charset="utf-8">'
+                        '<style>body{margin:0;background:#fff;font-family:sans-serif}</style>' + html,
+                        encoding="utf-8")
+                    m = re.search(r"data:image/png;base64,([A-Za-z0-9+/=\\n]{40,})", html)
+                    width, height = 500, 500
+                    if m:
+                        png = base64.b64decode(m.group(1).replace("\\n", "")[:64] + "==")
+                        width, height = struct.unpack(">II", png[16:24])
+                    outputs.append({"kind": "html", "src": f"assets/html/{slug}/{name}",
+                                    "width": width, "height": height + 90})
+                elif "text/plain" in data and kind == "execute_result" and not text_of(data["text/plain"]).startswith("<IPython.core.display"):
                     outputs.append({"kind": "text", "text": text_of(data["text/plain"])})
                 elif kind == "error":
                     outputs.append({"kind": "text", "text": f"{out.get('ename')}: {out.get('evalue')}"})

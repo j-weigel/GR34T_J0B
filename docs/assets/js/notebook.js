@@ -87,6 +87,8 @@
       const outs = (cell.outputs || []).map((o) =>
         o.kind === "image"
           ? `<img src="${esc(o.src)}" alt="Plot output of cell ${codeIndex}" loading="lazy"${o.width ? ` width="${o.width}" height="${o.height}"` : ""}>`
+          : o.kind === "html"
+          ? `<iframe class="nb-anim" src="${esc(o.src)}" title="Animation output of cell ${codeIndex}" loading="lazy" style="max-width:${o.width + 20}px;aspect-ratio:${o.width + 20} / ${o.height}"></iframe>`
           : `<pre>${esc(o.text.replace(/\n+$/, ""))}</pre>`
       ).join("");
       return `<div class="nb-cell">
